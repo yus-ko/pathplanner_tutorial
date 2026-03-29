@@ -1,33 +1,47 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.5)
 project(apf_pathplanner_tutorial)
 
-find_package(catkin REQUIRED COMPONENTS
-  pluginlib
-  pcl_ros
-  potbot_base
-  potbot_lib
-  potbot_msgs
-  dynamic_reconfigure
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(interactive_markers REQUIRED)
+find_package(potbot_lib REQUIRED)
+find_package(potbot_ros REQUIRED)
+
+set(DEPENDENCIES
+  rclcpp
+  tf2
+  tf2_ros
+  tf2_geometry_msgs
+  geometry_msgs
+  nav_msgs
+  sensor_msgs
+  visualization_msgs
   interactive_markers
+  potbot_lib
+  potbot_ros
 )
 
-generate_dynamic_reconfigure_options(
-  cfg/APFPathPlannerTutorial.cfg
-)
-
-catkin_package(
-  LIBRARIES potbot_lib
-)
-
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
-
-add_executable(${PROJECT_NAME} src/apf_pathplanner_tutorial.cpp)
-add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+add_executable(apf_pathplanner_tutorial src/apf_pathplanner_tutorial.cpp)
+ament_target_dependencies(apf_pathplanner_tutorial ${DEPENDENCIES})
 
 add_executable(interactive_marker_node src/interactive_marker_node.cpp)
-target_link_libraries(interactive_marker_node ${catkin_LIBRARIES})
+ament_target_dependencies(interactive_marker_node ${DEPENDENCIES})
 
-add_definitions(-std=c++14)
+install(TARGETS
+  apf_pathplanner_tutorial
+  interactive_marker_node
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY launch rviz
+  DESTINATION share/${PROJECT_NAME}
+)
+
+ament_package()
